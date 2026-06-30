@@ -48,6 +48,5 @@ if submitted:
     )
 
     pred = model.predict(sample)[0]
-    fert_key = [k for k in encoders.keys() if "fertilizer" in k.lower()][0]
-    fertilizer = encoders[fert_key].inverse_transform([pred])[0]
+    fertilizer = model.classes_[pred]
     st.success(f"✅ Recommended Fertilizer: **{fertilizer}**")
