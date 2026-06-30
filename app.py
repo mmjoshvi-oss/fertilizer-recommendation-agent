@@ -47,6 +47,5 @@ if submitted:
         columns=feature_order
     )
 
-    pred = int(model.predict(sample)[0])
-    fertilizer = model.classes_[pred]
+    fertilizer = model.predict(sample)[0]
     st.success(f"✅ Recommended Fertilizer: **{fertilizer}**")
