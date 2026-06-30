@@ -1,0 +1,72 @@
+import streamlit as st
+import pandas as pd
+import pickle
+
+st.set_page_config(
+    page_title="Fertilizer Prediction",
+    page_icon="🌱",
+    layout="wide"
+)
+
+# -------------------------
+# Load Model
+# -------------------------
+
+@st.cache_resource
+def load_model():
+
+    with open("fertilizer_prediction_model.pkl", "rb") as file:
+        saved = pickle.load(file)
+
+    return saved["model"], saved["encoders"]
+
+model, encoders = load_model()
+
+st.title("🌱 Fertilizer Recommendation System")
+
+st.write("Enter the required details below.")
+
+Temperature = st.number_input("Temperature")
+
+Humidity = st.number_input("Humidity")
+
+Moisture = st.number_input("Moisture")
+
+Soil = st.selectbox(
+    "Soil Type",
+    encoders["Soil Type"].classes_
+)
+
+Crop = st.selectbox(
+    "Crop Type",
+    encoders["Crop Type"].classes_
+)
+
+Nitrogen = st.number_input("Nitrogen")
+
+Potassium = st.number_input("Potassium")
+
+Phosphorous = st.number_input("Phosphorous")
+
+if st.button("Predict Fertilizer"):
+
+    soil = encoders["Soil Type"].transform([Soil])[0]
+
+    crop = encoders["Crop Type"].transform([Crop])[0]
+
+    sample = pd.DataFrame({
+        "Temperature":[Temperature],
+        "Humidity":[Humidity],
+        "Moisture":[Moisture],
+        "Soil Type":[soil],
+        "Crop Type":[crop],
+        "Nitrogen":[Nitrogen],
+        "Potassium":[Potassium],
+        "Phosphorous":[Phosphorous]
+    })
+
+    prediction = model.predict(sample)
+
+    fertilizer = encoders["Fertilizer Name"].inverse_transform(prediction)
+
+    st.success(f"Recommended Fertilizer: {fertilizer[0]}")
